@@ -10,5 +10,6 @@ namespace ApartmentRentProject.Interfaces
     {
         Task<string> RegistrationAsync(RegistrationViewModel model);
         Task<string> LoginAsync(LoginViewModel model);
+        Task<bool> MakeOrderAsync(string email, List<int> productList);
     }
 }

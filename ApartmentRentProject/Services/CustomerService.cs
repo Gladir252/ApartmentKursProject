@@ -20,9 +20,8 @@ namespace ApartmentRentProject.Services
 
         public async Task<string> RegistrationAsync(RegistrationViewModel registrationViewModel)
         {
-            //var res = await _apartmentContext.User.FirstOrDefaultAsync(e => e.Email == registrationViewModel.Email);
             if (registrationViewModel == null 
-                )
+                || await _apartmentContext.User.FirstOrDefaultAsync(e => e.Email == registrationViewModel.Email)!= null)
             {
                 return null;
             }
@@ -60,6 +59,29 @@ namespace ApartmentRentProject.Services
             }
 
             return new JwtCreater(currentUser.Email, currentUser.Role).GetJwt();
+        }
+
+        public async Task<bool> MakeOrderAsync(string email, List<int> productId)
+        {
+            Order order = new Order
+            {
+                Date = DateTime.Now,
+                StatusId = 1,
+                UserId = _apartmentContext.User.FirstOrDefaultAsync(e=>e.Email==email).Result.Id,
+                Number = "Number"
+            };
+            var result = await _apartmentContext.Order.AddAsync(order);
+
+            foreach (var id in productId)
+            {
+                await _apartmentContext.OrderProduct.AddAsync(new OrderProduct
+                {
+                    OrderId = result.Entity.Id,
+                    ProductId = id
+                });
+            }
+
+            return true;
         }
     }
 }
